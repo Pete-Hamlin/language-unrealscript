@@ -1,6 +1,6 @@
 {
   "name": "language-unrealscript",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "UnrealScript language support in Atom",
   "engines": {
     "atom": "*"
@@ -9,7 +9,6 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/Pete-Hamlin/language-unrealscript.git"
-
   },
   "bugs": {
     "url": "https://github.com/Pete-Hamlin/language-unrealscript/issues"
