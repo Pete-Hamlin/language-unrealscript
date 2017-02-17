@@ -1,6 +1,6 @@
 {
   "name": "language-unrealscript",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "UnrealScript language support in Atom",
   "engines": {
     "atom": "*"
