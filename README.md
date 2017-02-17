@@ -4,7 +4,7 @@ Syntax highlighting for UnrealScript (.uc) files, used by Unreal Engine 3. Curre
 
 I noticed Atom did not yet have a syntax package for the language, so I thought I'd make one.  It will load for any file with the .uc extension.
 
-Contributions to the language are more than welcome, in fact I active encourage others to Fork the repo and create pull requests.
+Contributions to the language are more than welcome, in fact I actively encourage others to Fork the repo and create pull requests.
 
 ## Install
 

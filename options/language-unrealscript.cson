@@ -1,4 +1,4 @@
-'.source.uc':
+'.source.cpp':
   'editor':
     'commentStart': '// '
     'increaseIndentPattern': '(?x)
@@ -14,6 +14,6 @@
       |^ \\s* (public|private|protected): \\s* $
       |^ \\s* @(public|private|protected) \\s* $
       '
-'.source.uc':
+'.source.cpp':
   'editor':
     'foldEndPattern': '(?<!\\*)\\*\\*/|^\\s*\\}'
