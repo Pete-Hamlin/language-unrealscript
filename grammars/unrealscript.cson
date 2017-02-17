@@ -1,7 +1,9 @@
-'scopeName': 'source.unrealscript'
-'name': 'UnrealScript'
-'fileTypes': ['uc']
-
+'scopeName': 'source.cpp'
+'fileTypes': [
+  'uc'
+]
+'firstLineMatch': '(?i)-\\*-[^*]*(Mode:\\s*)?C\\+\\+(\\s*;.*?)?\\s*-\\*-'
+'name': 'C++'
 'patterns': [
   {
     'include': '#special_block'
@@ -11,6 +13,10 @@
   }
   {
     'match': '\\b(friend|explicit|virtual|override|final|noexcept)\\b'
+    'name': 'storage.modifier.cpp'
+  }
+  {
+    'match': '\\b(var|protected|config|function|simulated|local|localized|delegate|public|private|event)\\b'
     'name': 'storage.modifier.cpp'
   }
   {
@@ -397,4 +403,3 @@
         'name': 'string.quoted.double.raw.cpp'
       }
     ]
-]
