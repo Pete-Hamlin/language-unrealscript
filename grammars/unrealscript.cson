@@ -38,7 +38,7 @@ patterns: [
   {
     # class declaration
     begin: '''(?ix)
-      ^[ \\t]*
+      ^[\\ \\t]*
       (class)\\s+([_A-Za-z][_A-Za-z0-9]*)\\s+
       (extends)\\s+([_A-Za-z][_A-Za-z0-9]*)
     '''
@@ -85,7 +85,7 @@ patterns: [
   {
     # global variables
     match: '''(?ix)
-      ^[ \\t]*
+      ^[\\ \\t]*
       (var)(?:\\((.*)\\))?
       ((?:\\s+(?:config|globalconfig|const|editconst|editconstarray|edfindable|editinline|input|transient|native|private|protected|travel|skip|export|localized|deprecated))*)
       \\s+([_A-Za-z][_A-Za-z0-9]*)
@@ -102,7 +102,7 @@ patterns: [
   }
   {
     match: '''(?ix)
-      ^[ \\t]*
+      ^[\\ \\t]*
       (struct|enum)\\s+([_A-Za-z][_A-Za-z0-9]*)
     '''
     captures:
@@ -110,7 +110,29 @@ patterns: [
       2: name: 'entity.name.type.cpp'
   }
   {
-    match: '(?i)\\b(self|super)\\b'
+    # states
+    match: '''(?ix)
+      ^[\\ \\t]*
+      (?:(auto)\\s+)?(state)(?:\\s*\\((.*?)\\))?
+      \\s+([_A-Za-z][_A-Za-z0-9]*)
+      (?:\\s+(extends)\\s+([_A-Za-z][_A-Za-z0-9]*))?
+    '''
+    captures:
+      1: name: 'storage.type.modifier.cpp'
+      2: name: 'storage.type.cpp'
+      3: name: 'entity.name.type.cpp'
+      4: name: 'entity.name.type.cpp'
+      5: name: 'storage.type.modifier.cpp'
+      6: name: 'entity.name.type.cpp'
+  }
+  {
+    # state labels:
+    match: '^([_A-Za-z][_A-Za-z0-9]*):'
+    captures:
+      1: name: 'string.quoted.single.c'  # to color labels same as in goto statements
+  }
+  {
+    match: '(?i)\\b(self|super|global)\\b'
     name: 'variable.language.this.cpp'
   }
   {
@@ -212,7 +234,7 @@ repository:
           {
             # local variables
             match: '''(?ix)
-              ^[ \\t]*
+              ^[\\ \\t]*
               (local)
               \\s+([_A-Za-z][_A-Za-z0-9]*)
               \\s*(?:<\\s*(?:([_A-Za-z][_A-Za-z0-9]*)|(class)\\s*<\\s*([_A-Za-z][_A-Za-z0-9]*)\\s*>)\\s*>)?
