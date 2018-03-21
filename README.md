@@ -18,4 +18,8 @@ $ apm install language-unrealscript
 
 As UnrealScript is based heavily on C++, this is package is essentially just a bare bones fork of the C++ language package for Atom with some added functions/classes used by only by UnrealEngine.
 
-Please feel free to report any problems with the language package by opening an issue or by all means, fix it and make a pull request.
+Please feel free to report any problems with the language package by opening an issue or by all means, fix it and make a pull request. Equally goes for any improvements that you wish to make, I will happily look through and merge.
+
+## Contributors ##
+
+poosh
