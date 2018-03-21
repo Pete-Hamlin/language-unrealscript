@@ -254,19 +254,49 @@ repository:
     ]
   'operators':
     patterns: [
+
       {
-        include: 'source.c#operators'
+        match: '--'
+        name: 'keyword.control.c'
       }
       {
-        match: '(?i)\\b(dot|cross)\\b'
-        name: 'keyword.operator.c'
+        match: '\\+\\+'
+        name: 'keyword.control.c'
       }
       {
-        match: '\\$|@'
-        name: 'keyword.operator.c'
+        match: '\\&=|@=|%=|\\+=|-=|\\*=|(?<!\\()/='
+        name: 'keyword.control.c'
       }
       {
-        match: '\\$=|@='
-        name: 'keyword.operator.assignment.compound.c'
+        match: '&=|\\^=|<<=|>>=|\\|='
+        name: 'keyword.control.c'
+      }
+      {
+        match: '<<|>>|>>>'
+        name: 'keyword.control.c'
+      }
+      {
+        match: '!=|<=|>=|==|~=|<|>'
+        name: 'keyword.control.c'
+      }
+      {
+        match: '&&|!|\\|\\|'
+        name: 'keyword.control.c'
+      }
+      {
+        match: '&|\\||\\^|~'
+        name: 'keyword.control.c'
+      }
+      {
+        match: '='
+        name: 'keyword.control.c'
+      }
+      {
+        match: '\\$|@|%|\\*|/|-|\\+|\\*\\*'
+        name: 'keyword.control.c'
+      }
+      {
+        match: '(?i)\\b(dot|cross|clockwisefrom)\\b'
+        name: 'keyword.control.c'
       }
     ]
