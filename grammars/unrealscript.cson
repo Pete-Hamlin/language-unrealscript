@@ -1,405 +1,250 @@
-'scopeName': 'source.cpp'
-'fileTypes': [
+scopeName: 'source.uc'
+fileTypes: [
   'uc'
 ]
-'firstLineMatch': '(?i)-\\*-[^*]*(Mode:\\s*)?C\\+\\+(\\s*;.*?)?\\s*-\\*-'
-'name': 'C++'
-'patterns': [
+firstLineMatch: '(?i)-\\*-[^*]*(Mode:\\s*)?C\\+\\+(\\s*;.*?)?\\s*-\\*-'
+name: 'UnrealScript'
+
+patterns: [
   {
-    'include': '#special_block'
+    include: 'source.c#comments'
   }
   {
-    'include': '#strings'
+    include: '#constants'
   }
   {
-    'match': '\\b(friend|explicit|virtual|override|final|noexcept)\\b'
-    'name': 'storage.modifier.cpp'
+    match: '(?i)\\bdefault\\b'
+    name: 'variable.other.member.c'
   }
   {
-    'match': '\\b(var|protected|config|function|simulated|local|localized|delegate|public|private|event)\\b'
-    'name': 'storage.modifier.cpp'
+    # e.g. class'Pawn'.default.Health = 100;
+    match: '(?i)\\.(default|static)\\.'
+    captures:
+      1: name: 'variable.other.member.c'
   }
   {
-    'match': '\\b(private:|protected:|public:)'
-    'name': 'storage.modifier.cpp'
+    match: '^#.*$'
+    captures:
+      0: name: 'entity.name.function.preprocessor.c'
   }
   {
-    'match': '\\b(catch|operator|try|throw|using)\\b'
-    'name': 'keyword.control.cpp'
+    match: '(?i)\\bdefaultproperties\\b'
+    name:  'keyword.control.cpp'
   }
   {
-    'match': '\\bdelete\\b(\\s*\\[\\])?|\\bnew\\b(?!])'
-    'name': 'keyword.control.cpp'
+    match: '(?i)\\b(replication|reliable|unreliable)\\b'
+    name: 'keyword.control.cpp'
   }
   {
-    # Common naming idiom for C++ instanced vars: "fMemberName"
-    'match': '\\b(f|m)[A-Z]\\w*\\b'
-    'name': 'variable.other.readwrite.member.cpp'
-  }
-  {
-    'match': '\\bthis\\b'
-    'name': 'variable.language.this.cpp'
-  }
-  {
-    'match': '\\bnullptr\\b'
-    'name': 'variable.language.cpp'
-  }
-  {
-    'match': '\\btemplate\\b\\s*'
-    'name': 'storage.type.template.cpp'
-  }
-  {
-    'match': '\\b(const_cast|dynamic_cast|reinterpret_cast|static_cast)\\b\\s*'
-    'name': 'keyword.operator.cast.cpp'
-  }
-  {
-    'match': '\\b(and|and_eq|bitand|bitor|compl|not|not_eq|or|or_eq|typeid|xor|xor_eq|alignof|alignas)\\b'
-    'name': 'keyword.operator.cpp'
-  }
-  {
-    'match': '\\b(class|decltype|wchar_t|char16_t|char32_t)\\b'
-    'name': 'storage.type.cpp'
-  }
-  {
-    'match': '\\b(constexpr|export|mutable|typename|thread_local)\\b'
-    'name': 'storage.modifier.cpp'
-  }
-  {
-    'begin': '''(?x)
-      (?:
-        ^ |                  # beginning of line
-        (?:(?<!else|new|=))  # or word + space before name
-      )
-      ((?:[A-Za-z_][A-Za-z0-9_]*::)*+~[A-Za-z_][A-Za-z0-9_]*) # actual name
-      \\s*(\\()              # opening bracket
+    # class declaration
+    begin: '''(?ix)
+      ^[ \\t]*
+      (class)\\s+([_A-Za-z][_A-Za-z0-9]*)\\s+
+      (extends)\\s+([_A-Za-z][_A-Za-z0-9]*)
     '''
-    'beginCaptures':
-      '1':
-        'name': 'entity.name.function.cpp'
-      '2':
-        'name': 'punctuation.definition.parameters.begin.c'
-    'end': '\\)'
-    'endCaptures':
-      '0':
-        'name': 'punctuation.definition.parameters.end.c'
-    'name': 'meta.function.destructor.cpp'
-    'patterns': [
+    beginCaptures:
+      1: name: 'storage.type.cpp'
+      2: name: 'entity.name.type.cpp'
+      3: name: 'storage.type.modifier.cpp'
+      4: name: 'entity.name.type.inherited.cpp'
+    end: ';'
+    patterns: [
       {
-        'include': '$base'
+        include: 'source.c#comments'
+      }
+      {
+        match: '''(?ix)
+            \\b(nativereplication|native|guid|transient|placeable|notplaceable|noexport
+            |exportstructs|cacheexempt|hidedropdown|collapsecategories|editinlinenew|instanced|dependson
+            |hidecategories|showcategories
+            )\\b
+        '''
+        name: 'storage.type.modifier.cpp'
+      }
+      {
+        match: '(?ix)\\bconfig\\b'
+        name: 'entity.name.function.cpp'
+      }
+      {
+        match: '(?ix)\\babstract\\b'
+        name: 'variable.language.this.cpp'
+      }
+      {
+        match: '(?ix)\\b(within)\\s+([_A-Za-z][_A-Za-z0-9]*)\\b'
+        captures:
+          1: name: 'storage.type.modifier.cpp'
+          2: name: 'entity.name.type.inherited.cpp'
+      }
+      {
+        match: '\\((.*?)\\)'
+        captures:
+          1: name: 'entity.name.type.cpp'
       }
     ]
   }
   {
-    'begin': '''(?x)
-      (?:
-        ^ |                  # beginning of line
-        (?:(?<!else|new|=))  # or word + space before name
-      )
-      ((?:[A-Za-z_][A-Za-z0-9_]*::)*+~[A-Za-z_][A-Za-z0-9_]*) # actual name
-      \\s*(\\()              # opening bracket
+    # global variables
+    match: '''(?ix)
+      ^[ \\t]*
+      (var)(?:\\((.*)\\))?
+      ((?:\\s+(?:config|globalconfig|const|editconst|editconstarray|edfindable|editinline|input|transient|native|private|protected|travel|skip|export|localized|deprecated))*)
+      \\s+([_A-Za-z][_A-Za-z0-9]*)
+      \\s*(?:<\\s*(?:([_A-Za-z][_A-Za-z0-9]*)|(class)\\s*<\\s*([_A-Za-z][_A-Za-z0-9]*)\\s*>)\\s*>)?
     '''
-    'beginCaptures':
-      '1':
-        'name': 'entity.name.function.cpp'
-      '2':
-        'name': 'punctuation.definition.parameters.begin.c'
-    'end': '\\)'
-    'endCaptures':
-      '0':
-        'name': 'punctuation.definition.parameters.end.c'
-    'name': 'meta.function.destructor.prototype.cpp'
-    'patterns': [
-      {
-        'include': '$base'
-      }
-    ]
+    captures:
+      1: name: 'storage.type.cpp'
+      2: name: 'entity.name.type.cpp'
+      3: name: 'storage.type.modifier.cpp'
+      4: name: 'entity.name.type.cpp'
+      5: name: 'entity.name.type.cpp'
+      6: name: 'storage.type.modifier.cpp'
+      7: name: 'entity.name.type.cpp'
   }
   {
-    'include': 'source.c'
+    match: '''(?ix)
+      ^[ \\t]*
+      (struct|enum)\\s+([_A-Za-z][_A-Za-z0-9]*)
+    '''
+    captures:
+      1: name: 'storage.type.cpp'
+      2: name: 'entity.name.type.cpp'
+  }
+  {
+    match: '(?i)\\b(self|super)\\b'
+    name: 'variable.language.this.cpp'
+  }
+  {
+    match: '(?i)\\b(exec|function|event|operator|iterator|static|final|simulated|protected|private|latent|native)\\b'
+    name: 'keyword.control.c'
+  }
+  {
+    match: '(?i)\\b(length)\\b'
+    name: 'keyword.control.c'
+  }
+  {
+    match: '(?i)\\b(optional|out|coerce)\\b'
+    name: 'storage.type.modifier.cpp'
+  }
+  {
+    include: '#operators'
+  }
+  {
+    include: '#storage_types'
+  }
+  {
+    include: '#block'
+  }
+  {
+    include: 'source.c'
   }
 ]
-'repository':
-  'angle_brackets':
-    'begin': '<'
-    'end': '>'
-    'name': 'meta.angle-brackets.cpp'
-    'patterns': [
+
+repository:
+  'constants':
+    patterns: [
       {
-        'include': '#angle_brackets'
+        match: '(?i)\\bnone\\b'
+        name: 'constant.language.cpp'
       }
       {
-        'include': '$base'
+        match: '(?i)\\b(DP_UpperLeft|DP_UpperMiddle|DP_UpperRight|DP_MiddleRight|DP_LowerRight|DP_LowerMiddle|DP_LowerLeft|DP_MiddleLeft|DP_MiddleMiddle)\\b'
+        name: 'constant.language.cpp'
+      }
+      {
+        match: '(?i)\\b(DM_Low|DM_High|DM_SuperHigh)\\b'
+        name: 'constant.language.cpp'
+      }
+      {
+        match: '(?i)\\b(DT_None|DT_Sprite|DT_Mesh|DT_Brush|DT_RopeSprite|DT_VerticalSprite|DT_Terraform|DT_SpriteAnimOnce|DT_StaticMesh|DT_DrawType|DT_Particle|DT_AntiPortal|DT_FluidSurface)\\b'
+        name: 'constant.language.cpp'
+      }
+      {
+        match: '(?i)\\b(PHYS_None|PHYS_Walking|PHYS_Falling|PHYS_Swimming|PHYS_Flying|PHYS_Rotating|PHYS_Projectile|PHYS_Interpolating|PHYS_MovingBrush|PHYS_Spider|PHYS_Trailer|PHYS_Ladder|PHYS_RootMotion|PHYS_Karma|PHYS_KarmaRagDoll|PHYS_Hovering|PHYS_CinMotion)\\b'
+        name: 'constant.language.cpp'
+      }
+      {
+        match: '(?i)\\b(ROLE_None|ROLE_DumbProxy|ROLE_SimulatedProxy|ROLE_AutonomousProxy|ROLE_Authority)\\b'
+        name: 'constant.language.cpp'
+      }
+      {
+        match: '(?i)\\b(NM_Standalone|NM_DedicatedServer|NM_ListenServer|NM_Client)\\b'
+        name: 'constant.language.cpp'
+      }
+      {
+        match: '(?i)\\b(STY_None|STY_Normal|STY_Masked|STY_Translucent|STY_Modulated|STY_Alpha|STY_Additive|STY_Subtractive|STY_Particle|STY_AlphaZ)\\b'
+        name: 'constant.language.cpp'
+      }
+      {
+        match: '(?i)\\b(SLOT_None|SLOT_Misc|SLOT_Pain|SLOT_Interact|SLOT_Ambient|SLOT_Talk|SLOT_Interface)\\b'
+        name: 'constant.language.cpp'
+      }
+      {
+        match: '(?i)\\b(LT_None|LT_Steady|LT_Pulse|LT_Blink|LT_Flicker|LT_Strobe|LT_BackdropLight|LT_SubtlePulse|LT_TexturePaletteOnce|LT_TexturePaletteLoop|LT_FadeOut)\\b'
+        name: 'constant.language.cpp'
+      }
+      {
+        match: '(?i)\\b(LE_None|LE_TorchWaver|LE_FireWaver|LE_WateryShimmer|LE_Searchlight|LE_SlowWave|LE_FastWave|LE_CloudCast|LE_StaticSpot|LE_Shock|LE_Disco|LE_Warp|LE_Spotlight|LE_NonIncidence|LE_Shell|LE_OmniBumpMap|LE_Interference|LE_Cylinder|LE_Rotor|LE_Negative|LE_Sunlight|LE_QuadraticNonIncidence)\\b'
+        name: 'constant.language.cpp'
+      }
+    ]
+  'storage_types':
+    patterns: [
+      {
+        match: '(?i)\\b(bool|byte|int|float|string|array|class|name)\\b'
+        name: 'storage.type.c'
+      }
+      {
+        match: '(?i)\\b(vector|rotator|plane|coords|quat)\\b'
+        name: 'entity.name.type.cpp'
       }
     ]
   'block':
-    'begin': '\\{'
-    'beginCaptures':
-      '0':
-        'name': 'punctuation.section.block.begin.c'
-    'end': '\\}'
-    'endCaptures':
-      '0':
-        'name': 'punctuation.section.block.end.c'
-    'name': 'meta.block.cpp'
-    'patterns': [
+    patterns: [
       {
-        'captures':
-          '1':
-            'name': 'support.function.any-method.c'
-          '2':
-            'name': 'punctuation.definition.parameters.c'
-        'match': '''(?x)
-          (
-            (?!while|for|do|if|else|switch|catch|enumerate|return|r?iterate)
-            (?:\\b[A-Za-z_][A-Za-z0-9_]*+\\b|::)*+ # actual name
-          )
-          \\s*(\\() # opening bracket
-        '''
-        'name': 'meta.function-call.c'
-      }
-      {
-        'include': '$base'
-      }
-    ]
-  'constructor':
-    'patterns': [
-      {
-        'begin': '''(?x)
-          (?:^\\s*)  # beginning of line
-          ((?!while|for|do|if|else|switch|catch|enumerate|r?iterate)[A-Za-z_][A-Za-z0-9_:]*) # actual name
-          \\s*(\\()  # opening bracket
-        '''
-        'beginCaptures':
-          '1':
-            'name': 'entity.name.function.cpp'
-          '2':
-            'name': 'punctuation.definition.parameters.begin.c'
-        'end': '\\)'
-        'endCaptures':
-          '0':
-            'name': 'punctuation.definition.parameters.end.c'
-        'name': 'meta.function.constructor.cpp'
-        'patterns': [
+        begin: '{'
+        beginCaptures:
+          0: name: 'punctuation.section.block.begin.bracket.curly.c'
+        end: '}'
+        endCaptures:
+          0:name: 'punctuation.section.block.end.bracket.curly.c'
+        name: 'meta.block.c'
+        patterns: [
           {
-            'include': '$base'
+            # local variables
+            match: '''(?ix)
+              ^[ \\t]*
+              (local)
+              \\s+([_A-Za-z][_A-Za-z0-9]*)
+              \\s*(?:<\\s*(?:([_A-Za-z][_A-Za-z0-9]*)|(class)\\s*<\\s*([_A-Za-z][_A-Za-z0-9]*)\\s*>)\\s*>)?
+            '''
+            captures:
+              1: name: 'storage.modifier.cpp'
+              2: name: 'entity.name.type.cpp'
+              3: name: 'entity.name.type.cpp'
+              4: name: 'storage.type.modifier.cpp'
+              5: name: 'entity.name.type.cpp'
           }
-        ]
-      }
-      {
-        'begin': '''(?x)
-          (:)
-          (
-            (?=
-              \\s*[A-Za-z_][A-Za-z0-9_:]* # actual name
-              \\s* (\\() # opening bracket
-            )
-          )
-        '''
-        'beginCaptures':
-          '1':
-            'name': 'punctuation.definition.parameters.c'
-        'end': '(?=\\{)'
-        'name': 'meta.function.constructor.initializer-list.cpp'
-        'patterns': [
           {
-            'include': '$base'
+            include: '$base'
           }
         ]
       }
     ]
-  'special_block':
-    'patterns': [
+  'operators':
+    patterns: [
       {
-        "begin": "\\b(using)\\b\\s*(namespace)\\b\\s*((?:[_A-Za-z][_A-Za-z0-9]*\\b(::)?)*)",
-        "beginCaptures": {
-          "1": {
-            "name": "keyword.control.cpp"
-          },
-          "2": {
-            "name": "storage.type.cpp"
-          },
-          "3": {
-            "name": "entity.name.type.cpp"
-          }
-        },
-        "end": "(;)",
-        "name": "meta.using-namespace-declaration.cpp"
-      },
-      {
-        'begin': '\\b(namespace)\\b\\s*([_A-Za-z][_A-Za-z0-9]*\\b)?+'
-        'beginCaptures':
-          '1':
-            'name': 'storage.type.cpp'
-          '2':
-            'name': 'entity.name.type.cpp'
-        'captures':
-          '1':
-            'name': 'keyword.control.namespace.$2'
-        'end': '(?<=\\})|(?=(;|,|\\(|\\)|>|\\[|\\]|=))'
-        'name': 'meta.namespace-block.cpp'
-        'patterns': [
-          {
-            'begin': '\\{'
-            'beginCaptures':
-              '0':
-                'name': 'punctuation.definition.scope.cpp'
-            'end': '\\}'
-            'endCaptures':
-              '0':
-                'name': 'punctuation.definition.scope.cpp'
-            'patterns': [
-              {
-                'include': '#special_block'
-              }
-              {
-                'include': '#constructor'
-              }
-              {
-                'include': '$base'
-              }
-            ]
-          }
-          {
-            'include': '$base'
-          }
-        ]
+        include: 'source.c#operators'
       }
       {
-        'begin': '\\b(class|struct)\\b\\s*([_A-Za-z][_A-Za-z0-9]*\\b)?+(\\s*:\\s*(public|protected|private)\\s*([_A-Za-z][_A-Za-z0-9]*\\b)((\\s*,\\s*(public|protected|private)\\s*[_A-Za-z][_A-Za-z0-9]*\\b)*))?'
-        'beginCaptures':
-          '1':
-            'name': 'storage.type.cpp'
-          '2':
-            'name': 'entity.name.type.cpp'
-          '4':
-            'name': 'storage.type.modifier.cpp'
-          '5':
-            'name': 'entity.name.type.inherited.cpp'
-          '6':
-            'patterns': [
-              {
-                'match': '(public|protected|private)'
-                'name': 'storage.type.modifier.cpp'
-              }
-              {
-                'match': '[_A-Za-z][_A-Za-z0-9]*'
-                'name': 'entity.name.type.inherited.cpp'
-              }
-            ]
-        'end': '(?<=\\})|(?=(;|\\(|\\)|>|\\[|\\]|=))'
-        'name': 'meta.class-struct-block.cpp'
-        'patterns': [
-          {
-            'include': '#angle_brackets'
-          }
-          {
-            'begin': '\\{'
-            'beginCaptures':
-              '0':
-                'name': 'punctuation.section.block.begin.cpp'
-            'end': '(\\})(\\s*\\n)?'
-            'endCaptures':
-              '1':
-                'name': 'punctuation.section.block.end.cpp'
-              '2':
-                'name': 'invalid.illegal.you-forgot-semicolon.cpp'
-            'patterns': [
-              {
-                'include': '#special_block'
-              }
-              {
-                'include': '#constructor'
-              }
-              {
-                'include': '$base'
-              }
-            ]
-          }
-          {
-            'include': '$base'
-          }
-        ]
+        match: '(?i)\\b(dot|cross)\\b'
+        name: 'keyword.operator.c'
       }
       {
-        'begin': '\\b(extern)(?=\\s*")'
-        'beginCaptures':
-          '1':
-            'name': 'storage.modifier.cpp'
-        'end': '(?<=\\})|(?=\\w)|(?=\\s*#\\s*endif\\b)'
-        'name': 'meta.extern-block.cpp'
-        'patterns': [
-          {
-            'begin': '\\{'
-            'beginCaptures':
-              '0':
-                'name': 'punctuation.section.block.begin.c'
-            'end': '\\}|(?=\\s*#\\s*endif\\b)'
-            'endCaptures':
-              '0':
-                'name': 'punctuation.section.block.end.c'
-            'patterns': [
-              {
-                'include': '#special_block'
-              }
-              {
-                'include': '$base'
-              }
-            ]
-          }
-          {
-            'include': '$base'
-          }
-        ]
-      }
-    ]
-  'strings':
-    'patterns': [
-      {
-        'begin': '(u|u8|U|L)?"'
-        'beginCaptures':
-          '0':
-            'name': 'punctuation.definition.string.begin.cpp'
-          '1':
-            'name': 'meta.encoding.cpp'
-        'end': '"'
-        'endCaptures':
-          '0':
-            'name': 'punctuation.definition.string.end.cpp'
-        'name': 'string.quoted.double.cpp'
-        'patterns': [
-          {
-            'match': '\\\\u\\h{4}|\\\\U\\h{8}'
-            'name': 'constant.character.escape.cpp'
-          }
-          {
-            'match': '\\\\[\'"?\\\\abfnrtv]'
-            'name': 'constant.character.escape.cpp'
-          }
-          {
-            'match': '\\\\[0-7]{1,3}'
-            'name': 'constant.character.escape.cpp'
-          }
-          {
-            'match': '\\\\x\\h+'
-            'name': 'constant.character.escape.cpp'
-          }
-        ]
+        match: '\\$|@'
+        name: 'keyword.operator.c'
       }
       {
-        'begin': '(u|u8|U|L)?R"(?:([^ ()\\\\\\t]{0,16})|([^ ()\\\\\\t]*))\\('
-        'beginCaptures':
-          '0':
-            'name': 'punctuation.definition.string.begin.cpp'
-          '1':
-            'name': 'meta.encoding.cpp'
-          '3':
-            'name': 'invalid.illegal.delimiter-too-long.cpp'
-        'end': '\\)\\2(\\3)"'
-        'endCaptures':
-          '0':
-            'name': 'punctuation.definition.string.end.cpp'
-          '1':
-            'name': 'invalid.illegal.delimiter-too-long.cpp'
-        'name': 'string.quoted.double.raw.cpp'
+        match: '\\$=|@='
+        name: 'keyword.operator.assignment.compound.c'
       }
     ]
